@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Libros - Biblioteca</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Nuestros CSS -->
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/components.css}">
+    <link rel="stylesheet" th:href="@{/css/responsive.css}">
+</head>
+<body class="d-flex flex-column min-vh-100">
+    <!-- Header -->
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" th:href="@{/}">
+                    <i class="fas fa-book me-2"></i>Biblioteca Digital
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/}">
+                                <i class="fas fa-home me-1"></i>Inicio
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" th:href="@{/libros}">
+                                <i class="fas fa-book-open me-1"></i>Libros
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/categorias}">
+                                <i class="fas fa-tags me-1"></i>Categorías
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/quejas/nueva}">
+                                <i class="fas fa-comments me-1"></i>Quejas
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow-1 py-4">
+        <div class="container">
+            <!-- Flash Messages -->
+            <div th:if="${mensaje}" class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+                <i class="fas fa-check-circle me-2"></i>
+                <span th:text="${mensaje}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <!-- Page Header -->
+            <div class="row mb-4">
+                <div class="col">
+                    <h1 class="fw-bold">
+                        <i class="fas fa-book-open me-2"></i>Gestión de Libros
+                    </h1>
+                    <p class="lead text-muted">Administra el catálogo de libros de la biblioteca</p>
+                </div>
+                <div class="col-auto">
+                    <a th:href="@{/libros/nuevo}" class="btn btn-primary btn-lg">
+                        <i class="fas fa-plus me-2"></i>Nuevo Libro
+                    </a>
+                </div>
+            </div>
+
+            <!-- Books Table -->
+            <div class="card shadow">
+                <div class="card-body">
+                    <div th:if="${libros != null and !libros.empty}">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Título</th>
+                                        <th>Autor</th>
+                                        <th>Categoría</th>
+                                        <th>Disponible</th>
+                                        <th>Precio</th>
+                                        <th>Fecha Publicación</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="libro : ${libros}">
+                                        <td th:text="${libro.titulo}"></td>
+                                        <td th:text="${libro.autor}"></td>
+                                        <td>
+                                            <span class="badge bg-info" th:text="${libro.categoria.nombre}"></span>
+                                        </td>
+                                        <td>
+                                            <span th:if="${libro.disponible}" class="badge bg-success">Sí</span>
+                                            <span th:unless="${libro.disponible}" class="badge bg-danger">No</span>
+                                        </td>
+                                        <td>
+                                            <span th:if="${libro.precio != null}" 
+                                                  th:text="'$' + ${#numbers.formatDecimal(libro.precio, 1, 2)}"></span>
+                                            <span th:unless="${libro.precio != null}" class="text-muted">-</span>
+                                        </td>
+                                        <td th:text="${libro.fechaPublicacion}"></td>
+                                        <td>
+                                            <div class="btn-group" role="group">
+                                                <a th:href="@{/libros/editar/{id}(id=${libro.id})}" 
+                                                   class="btn btn-warning btn-sm">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <a th:href="@{/libros/eliminar/{id}(id=${libro.id})}" 
+                                                   class="btn btn-danger btn-sm"
+                                                   onclick="return confirm('¿Estás seguro de eliminar este libro?')">
+                                                    <i class="fas fa-trash"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <!-- Empty State -->
+                    <div th:unless="${libros != null and !libros.empty}" class="text-center py-5">
+                        <i class="fas fa-book fa-4x text-muted mb-3"></i>
+                        <h4 class="text-muted">No hay libros registrados</h4>
+                        <p class="text-muted">Comienza agregando el primer libro a la biblioteca.</p>
+                        <a th:href="@{/libros/nuevo}" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i>Agregar Primer Libro
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-light py-4 mt-5">
+        <div class="container">
+            <div class="text-center">
+                <p class="mb-0">&copy; 2024 Biblioteca Digital. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
