@@ -4,8 +4,6 @@ package com.Biblioteca.demo.service.impl;
  *
  * @author darry
  */
-
-
 import com.Biblioteca.demo.domain.Libro;
 import com.Biblioteca.demo.domain.Categoria;
 import com.Biblioteca.demo.repository.LibroRepository;
@@ -85,5 +83,11 @@ public class LibroServiceImpl implements LibroService {
     @Transactional(readOnly = true)
     public List<Libro> findAllWithCategoria() {
         return libroRepository.findAllWithCategoria();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<Libro> findLibroMasReciente() {
+        return libroRepository.findTopByOrderByIdDesc();
     }
 }

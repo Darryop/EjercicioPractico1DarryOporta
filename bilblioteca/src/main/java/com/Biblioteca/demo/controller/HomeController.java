@@ -11,6 +11,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 public class HomeController {
@@ -20,12 +21,15 @@ public class HomeController {
 
     @GetMapping("/")
     public String home(Model model) {
-        // Obtener algunos libros para mostrar en la página de inicio
+        // Obtener el libro más reciente para mostrar en la página de inicio
+        Optional<Libro> libroReciente = libroService.findLibroMasReciente();
+        
+        // Obtener algunos libros para mostrar como destacados
         List<Libro> librosDestacados = libroService.findDisponibles();
         
-        // Si hay libros, tomar el primero como "nuevo libro destacado"
-        if (!librosDestacados.isEmpty()) {
-            model.addAttribute("nuevoLibro", librosDestacados.get(0));
+        // Agregar atributos al modelo
+        if (libroReciente.isPresent()) {
+            model.addAttribute("nuevoLibro", libroReciente.get());
         }
         
         model.addAttribute("titulo", "Biblioteca Digital");
